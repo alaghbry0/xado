@@ -35,9 +35,15 @@ async def create_db_connection():
     except Exception as e:
         logging.error(f"حدث خطأ أثناء إنشاء اتصال قاعدة البيانات: {e}")
         return
+    async with app.db_pool.acquire() as connection:
+        rows = await connection.fetch("SELECT name, details FROM subscription_types")
+        for row in rows:
+            print(f"Raw Details: {row['details']}")
+            print(f"UTF-8 Encoded: {row['details'].encode('utf-8')}")
 
     # إعداد الجدولة
     await setup_scheduler()
+
 
 @app.after_serving
 async def close_resources():
@@ -56,25 +62,6 @@ async def close_resources():
 
 # إعداد تسجيل الأخطاء والمعلومات
 logging.basicConfig(level=logging.DEBUG, format='%(asctime)s - %(levelname)s - %(message)s')
-
-
-# بيانات الاشتراكات الوهمية
-subscriptions = [
-    {
-        "id": 1,
-        "name": "Forex VIP Channel",
-        "price": 5,
-        "details": "اشترك في قناة الفوركس للحصول على توصيات مميزة.",
-        "image_url": "assets/img/forex_channel.jpg"
-    },
-    {
-        "id": 2,
-        "name": "Crypto VIP Channel",
-        "price": 10,
-        "details": "اشترك في قناة الكريبتو للحصول على توصيات مميزة.",
-        "image_url": "assets/img/crypto_channel.jpg"
-    }
-]
 
 
 # نقطة API للاشتراك
@@ -330,7 +317,15 @@ async def home():
 
 @app.route("/shop", endpoint="shop")
 async def shop():
+    async with app.db_pool.acquire() as connection:
+        subscriptions = await connection.fetch("""
+            SELECT id, name, price, details, image_url
+            FROM subscription_types
+            WHERE is_active = TRUE
+        """)
     return await render_template("shop.html", subscriptions=subscriptions)
+
+
 
 @app.route('/api/verify', methods=['POST'])
 async def verify_user():

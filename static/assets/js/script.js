@@ -293,15 +293,17 @@ $(window).on('resize', function () {
 });
 
 //داله الاشتراك
-window.subscribe = function (subscriptionType) {
+window.subscribe = function (subscriptionTypeId) {
     console.log("بدء عملية الاشتراك...");
 
+    // التأكد من تهيئة Telegram WebApp API
     if (!window.tg) {
         console.error("Telegram WebApp API غير مهيأ.");
         alert("يرجى تشغيل التطبيق من داخل Telegram.");
         return;
     }
 
+    // الحصول على بيانات المستخدم من Telegram WebApp API
     const userData = window.tg.initDataUnsafe?.user;
     if (!userData || !userData.id) {
         console.error("Telegram ID غير متوفر بعد التهيئة.");
@@ -309,18 +311,18 @@ window.subscribe = function (subscriptionType) {
         return;
     }
 
+    // إعداد بيانات الاشتراك
     const telegramId = userData.id;
-
     const subscriptionData = {
         telegram_id: telegramId,
-        subscription_type_id: subscriptionType,
+        subscription_type_id: subscriptionTypeId, // استخدام id الخاص بـ subscription_types
     };
 
     console.log("البيانات المرسلة للاشتراك:", subscriptionData);
 
     // إرسال بيانات الاشتراك إلى API
     window.performAjaxRequest({
-        url: "https://exaado-mini-app-c04ea61e41f4.herokuapp.com/api/subscribe",
+        url: "https://xado.onrender.com/api/subscribe",
         method: "POST",
         data: subscriptionData,
         onSuccess: (response) => {
@@ -383,7 +385,7 @@ window.renewSubscription = function (subscriptionType) {
 
     // إرسال بيانات التجديد إلى API
     window.performAjaxRequest({
-        url: "https://exaado-mini-app-c04ea61e41f4.herokuapp.com/api/renew",
+        url: "https://xado.onrender.com/api/renew",
         method: "POST",
         data: renewalData,
         onSuccess: (response) => {
