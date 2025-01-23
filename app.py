@@ -35,12 +35,6 @@ async def create_db_connection():
     except Exception as e:
         logging.error(f"حدث خطأ أثناء إنشاء اتصال قاعدة البيانات: {e}")
         return
-    async with app.db_pool.acquire() as connection:
-        rows = await connection.fetch("SELECT name, details FROM subscription_types")
-        for row in rows:
-            print(f"Raw Details: {row['details']}")
-            print(f"UTF-8 Encoded: {row['details'].encode('utf-8')}")
-
     # إعداد الجدولة
     await setup_scheduler()
 
