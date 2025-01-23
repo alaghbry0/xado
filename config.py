@@ -1,7 +1,5 @@
 import os
 
-load_dotenv()
-
 
 TELEGRAM_BOT_TOKEN = "7490344438:AAHtSw6V0vTn7i1mIIuGPgJ_PqDTJXKAeos"
 
