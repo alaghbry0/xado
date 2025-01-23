@@ -5,8 +5,8 @@ DEFAULT_CHANNEL_ID = "-1002277553158"  # المعرف الافتراضي للق�
 # إعداد اتصال قاعدة البيانات
 DATABASE_CONFIG = {
     'user': 'exaado_user',
-    'password': 'Moh*770175667',
+    'password': 'QtLT0xcvRrmGfCreZDqrA4mP5Qvm12Gn',
     'database': 'exaado_db',
-    'host': 'localhost',
+    'host': 'dpg-cu8ng40gph6c738sqr5g-a',
     'port': 5432
 }
