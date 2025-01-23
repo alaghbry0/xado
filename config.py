@@ -1,5 +1,9 @@
 import os
 import asyncpg
+from dotenv import load_dotenv
+load_dotenv()  # تحميل متغيرات البيئة
+
+
 
 # إعداد اتصال قاعدة البيانات
 DATABASE_CONFIG = {
