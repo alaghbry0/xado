@@ -6,14 +6,9 @@
     <!-- Required Scripts -->
     <script async src="https://telegram.org/js/telegram-web-app.js"></script>
     <script src="https://code.jquery.com/jquery-3.7.1.min.js"></script>
-    <script src="{{ url_for('static', filename='assets/js/script.js') }}"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@tonconnect/sdk@latest"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery-cookie/1.4.1/jquery.cookie.min.js"></script>
     <script src="{{ url_for('static', filename='assets/js/popper.min.js') }}"></script>
-    <script src="{{ url_for('static', filename='assets/vendor/bootstrap-5/js/bootstrap.bundle.min.js') }}"></script>
-    <script src="{{ url_for('static', filename='assets/js/color-scheme.js') }}"></script>
-    <script src="{{ url_for('static', filename='assets/js/app.js') }}"></script>
-
-
 
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
@@ -45,6 +40,11 @@
                     <i class="bi bi-list"></i>
                 </button>
             </div>
+            <div>
+                <button id="connect-wallet-button">ربط المحفظة</button>
+            </div>
+
+
             <div class="col text-center">
                 <h1 class="m-0 text-primary">Exaado</h1>
             </div>
@@ -56,6 +56,11 @@
         </div>
     </header>
     <!-- Header Ends -->
+
+        <!-- تعريف telegramId -->
+    <script>
+        window.telegramId = {{ telegram_id }}; // يتم حقن telegram_id من الخادم
+    </script>
 
     <!-- Main Content -->
     <main class="h-100 has-footer">
@@ -106,6 +111,11 @@
         </div> <!-- تم إغلاق div -->
     </main>
     <!-- Main Content Ends -->
+
+    <script src="{{ url_for('static', filename='assets/js/script.js') }}"></script>
+    <script src="{{ url_for('static', filename='assets/vendor/bootstrap-5/js/bootstrap.bundle.min.js') }}"></script>
+    <script src="{{ url_for('static', filename='assets/js/color-scheme.js') }}"></script>
+    <script src="{{ url_for('static', filename='assets/js/app.js') }}"></script>
 
     <!-- Footer -->
     <footer class="footer">
