@@ -457,56 +457,52 @@ function hideLoading() {
 }
 
 // دالة لربط المحفظة باستخدام TON Connect SDK
-window.addEventListener('load', function () {
-    // التحقق من تحميل المكتبة
-    if (typeof TonConnectSDK === 'undefined') {
+document.addEventListener("DOMContentLoaded", function () {
+    if (typeof TonConnect === "undefined") {
         console.error("TON Connect SDK not loaded.");
         alert("❌ TON Connect SDK غير متوفر.");
-        return;
-    }
-
-    // تعريف دالة ربط المحفظة
-    window.linkWallet = function () {
-        try {
-            // تهيئة TonConnect باستخدام المكتبة
-            const tonConnect = new TonConnectSDK.TonConnect();
-
-            // طلب ربط المحفظة
-            tonConnect.connect()
-                .then((wallet) => {
-                    if (wallet?.account) {
-                        console.log("Wallet connected successfully:", wallet);
-                        const walletAddress = wallet.account;
-
-                        // إرسال عنوان المحفظة إلى الخادم
-                        window.performAjaxRequest({
-                            url: "/api/link-wallet",
-                            method: "POST",
-                            data: { telegram_id: window.telegramId, wallet_address: walletAddress },
-                            onSuccess: (response) => alert("🎉 تم ربط المحفظة بنجاح!"),
-                            onError: (error) => alert("❌ حدث خطأ أثناء ربط المحفظة."),
-                        });
-                    } else {
-                        alert("❌ لم يتم ربط المحفظة.");
-                    }
-                })
-                .catch((error) => {
-                    console.error("Error connecting to wallet:", error);
-                    alert("❌ حدث خطأ أثناء محاولة ربط المحفظة.");
-                });
-        } catch (error) {
-            console.error("TON Connect SDK not available or not loaded:", error);
-            alert("❌ TON Connect SDK غير متوفر.");
-        }
-    };
-
-    // ربط الحدث بزر "ربط المحفظة"
-    const linkWalletButton = document.getElementById("link-wallet-btn");
-    if (linkWalletButton) {
-        linkWalletButton.addEventListener("click", window.linkWallet);
     } else {
-        console.error("Button with ID 'link-wallet-btn' not found.");
+        console.log("TON Connect SDK loaded successfully.");
+        window.linkWallet = function () {
+            try {
+                const tonConnect = new TonConnect();
+                tonConnect.connect()
+                    .then((wallet) => {
+                        if (wallet?.account) {
+                            console.log("Wallet connected successfully:", wallet);
+                            const walletAddress = wallet.account;
+
+                            // إرسال عنوان المحفظة إلى الخادم
+                            window.performAjaxRequest({
+                                url: "/api/link-wallet",
+                                method: "POST",
+                                data: { telegram_id: window.telegramId, wallet_address: walletAddress },
+                                onSuccess: (response) => alert("🎉 تم ربط المحفظة بنجاح!"),
+                                onError: (error) => alert("❌ حدث خطأ أثناء ربط المحفظة."),
+                            });
+                        } else {
+                            alert("❌ لم يتم ربط المحفظة.");
+                        }
+                    })
+                    .catch((error) => {
+                        console.error("Error connecting to wallet:", error);
+                        alert("❌ حدث خطأ أثناء محاولة ربط المحفظة.");
+                    });
+            } catch (error) {
+                console.error("TON Connect SDK not available:", error);
+                alert("❌ TON Connect SDK غير متوفر.");
+            }
+        };
+
+        // ربط الزر
+        const linkWalletButton = document.getElementById("link-wallet-btn");
+        if (linkWalletButton) {
+            linkWalletButton.addEventListener("click", window.linkWallet);
+        } else {
+            console.error("Button with ID 'link-wallet-btn' not found.");
+        }
     }
 });
+
 
 
