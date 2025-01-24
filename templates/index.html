@@ -6,7 +6,6 @@
     <!-- Required Scripts -->
     <script async src="https://telegram.org/js/telegram-web-app.js"></script>
     <script src="https://code.jquery.com/jquery-3.7.1.min.js"></script>
-    <script src="https://cdn.jsdelivr.net/npm/@tonconnect/sdk@latest"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery-cookie/1.4.1/jquery.cookie.min.js"></script>
     <script src="{{ url_for('static', filename='assets/js/popper.min.js') }}"></script>
 
@@ -40,9 +39,6 @@
                     <i class="bi bi-list"></i>
                 </button>
             </div>
-            <div>
-                <button id="connect-wallet-button">ربط المحفظة</button>
-            </div>
 
 
             <div class="col text-center">
@@ -58,9 +54,7 @@
     <!-- Header Ends -->
 
         <!-- تعريف telegramId -->
-    <script>
-        window.telegramId = {{ telegram_id }}; // يتم حقن telegram_id من الخادم
-    </script>
+
 
     <!-- Main Content -->
     <main class="h-100 has-footer">

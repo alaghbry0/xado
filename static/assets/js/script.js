@@ -456,86 +456,30 @@ function hideLoading() {
     }
 }
 
-
-// تعريف متغيرات عامة
-const walletButton = document.getElementById('connect-wallet-button');
-const walletStatus = document.getElementById('wallet-status');
-
-// الدالة للتحقق مما إذا كانت المحفظة مربوطة بالفعل
-const checkWalletStatus = async () => {
+// دالة لربط المحفظة باستخدام TON Connect SDK
+document.getElementById("link-wallet-btn").addEventListener("click", function () {
     try {
-        const response = await fetch('/api/check-wallet', {
-            method: 'GET',
-            headers: {
-                'Content-Type': 'application/json',
-            },
-        });
-
-        if (response.ok) {
-            const result = await response.json();
-            if (result.wallet_address) {
-                walletStatus.textContent = `محفظتك: ${result.wallet_address}`;
-                walletButton.textContent = 'تغيير المحفظة';
-            } else {
-                walletStatus.textContent = 'لم يتم ربط أي محفظة';
-            }
-        } else {
-            console.error('Failed to fetch wallet status');
-        }
-    } catch (error) {
-        console.error('Error checking wallet status:', error);
-    }
-};
-
-// الدالة لربط المحفظة
-const connectWallet = async () => {
-    try {
-        // التحقق من وجود TonConnect في النافذة
-        if (!window.TonConnect) {
-            alert('TonConnect SDK غير متوفر. يرجى التأكد من تحميل المكتبة.');
-            return;
-        }
-
         const tonConnect = new TonConnect();
-        const provider = await tonConnect.connectWallet(); // فتح نافذة اختيار المحفظة
+        tonConnect.connect()
+            .then((wallet) => {
+                console.log("Wallet connected:", wallet);
+                const walletAddress = wallet.account;
 
-        if (provider) {
-            const walletAddress = provider.account.address;
-
-            // إرسال عنوان المحفظة إلى الخادم لتخزينه
-            const response = await fetch('/api/connect-wallet', {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json',
-                },
-                body: JSON.stringify({
-                    telegram_id: window.telegramId, // يجب توفير telegramId من HTML
-                    wallet_address: walletAddress,
-                }),
+                // إرسال العنوان إلى الخادم لتخزينه
+                window.performAjaxRequest({
+                    url: "/api/link-wallet",
+                    method: "POST",
+                    data: { telegram_id: window.telegramId, wallet_address: walletAddress },
+                    onSuccess: (response) => alert("🎉 تم ربط المحفظة بنجاح!"),
+                    onError: (error) => alert("❌ حدث خطأ أثناء ربط المحفظة."),
+                });
+            })
+            .catch((error) => {
+                console.error("Error connecting wallet:", error);
+                alert("❌ حدث خطأ أثناء محاولة ربط المحفظة.");
             });
-
-            if (response.ok) {
-                const result = await response.json();
-                alert('تم ربط المحفظة بنجاح!');
-                walletStatus.textContent = `محفظتك: ${result.wallet_address}`;
-                walletButton.textContent = 'تغيير المحفظة';
-            } else {
-                const error = await response.json();
-                alert(`فشل في ربط المحفظة: ${error.error}`);
-            }
-        } else {
-            alert('لم يتم اختيار أي محفظة.');
-        }
     } catch (error) {
-        console.error('Error connecting wallet:', error);
-        alert('حدث خطأ أثناء محاولة ربط المحفظة.');
+        console.error("TON Connect SDK not available:", error);
+        alert("❌ TON Connect SDK غير متوفر.");
     }
-};
-
-// إضافة الأحداث إلى زر ربط المحفظة
-walletButton.addEventListener('click', connectWallet);
-
-// التحقق من حالة المحفظة عند تحميل الصفحة
-window.onload = () => {
-    checkWalletStatus();
-};
+});

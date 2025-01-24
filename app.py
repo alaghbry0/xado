@@ -304,49 +304,30 @@ async def check_subscription():
         logging.error(f"Error in check_subscription: {str(e)}")
         return jsonify({"error": "An unexpected error occurred"}), 500
 
-@app.route("/api/connect-wallet", methods=["POST"])
-async def connect_wallet():
+@app.route("/api/link-wallet", methods=["POST"])
+async def link_wallet():
     """
-    معالجة طلب ربط محفظة TON.
+    ربط محفظة المستخدم وحفظ عنوانها.
     """
     try:
-        # استقبال البيانات من الطلب
         data = await request.get_json()
         telegram_id = int(data.get("telegram_id"))
         wallet_address = data.get("wallet_address")
 
-        logging.info(f"Received telegram_id: {telegram_id}, wallet_address: {wallet_address}")
-
-        # التحقق من صحة البيانات المدخلة
-        if not telegram_id or not wallet_address:
-            error_message = "Missing 'telegram_id' or 'wallet_address'"
-            logging.error(error_message)
-            return jsonify({"error": error_message}), 400
+        if not wallet_address:
+            return jsonify({"error": "Wallet address is required"}), 400
 
         async with app.db_pool.acquire() as connection:
-            # التحقق من وجود المستخدم في قاعدة البيانات
-            user = await connection.fetchrow(
-                "SELECT * FROM users WHERE telegram_id = $1", telegram_id
+            # تحديث عنوان المحفظة في جدول المستخدمين
+            await connection.execute(
+                "UPDATE users SET wallet_address = $1 WHERE telegram_id = $2",
+                wallet_address, telegram_id
             )
 
-            if not user:
-                logging.error(f"User with telegram_id {telegram_id} not found.")
-                return jsonify({"error": "User not found"}), 404
-
-            # تحديث عنوان المحفظة في قاعدة البيانات
-            await connection.execute("""
-                UPDATE users
-                SET wallet_address = $1
-                WHERE telegram_id = $2
-            """, wallet_address, telegram_id)
-
-            logging.info(f"Wallet address updated for user {telegram_id}: {wallet_address}")
-
-        # إرسال رسالة نجاح
-        return jsonify({"message": "Wallet connected successfully", "wallet_address": wallet_address}), 200
+        return jsonify({"message": "Wallet linked successfully"}), 200
 
     except Exception as e:
-        logging.error(f"Unexpected error in connect_wallet: {e}")
+        logging.error(f"Error linking wallet: {e}")
         return jsonify({"error": "An unexpected error occurred"}), 500
 
 
