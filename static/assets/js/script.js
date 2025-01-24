@@ -457,48 +457,50 @@ function hideLoading() {
 }
 
 // دالة لربط المحفظة باستخدام TON Connect SDK
-window.linkWallet = function () {
-    try {
-        const tonConnect = new TonConnect();
-        tonConnect.connect()
-            .then((wallet) => {
-                if (wallet?.account) {
-                    console.log("Wallet connected successfully:", wallet);
-                    const walletAddress = wallet.account;
-
-                    window.performAjaxRequest({
-                        url: "/api/link-wallet",
-                        method: "POST",
-                        data: { telegram_id: window.telegramId, wallet_address: walletAddress },
-                        onSuccess: (response) => alert("🎉 تم ربط المحفظة بنجاح!"),
-                        onError: (error) => alert("❌ حدث خطأ أثناء ربط المحفظة."),
-                    });
-                } else {
-                    alert("❌ لم يتم ربط المحفظة.");
-                }
-            })
-            .catch((error) => {
-                console.error("Error connecting to wallet:", error);
-                alert("❌ حدث خطأ أثناء محاولة ربط المحفظة.");
-            });
-    } catch (error) {
-        console.error("TON Connect SDK not available:", error);
+window.addEventListener('load', function () {
+    // التحقق من تحميل المكتبة
+    if (typeof TonConnectSDK === 'undefined') {
+        console.error("TON Connect SDK not loaded.");
         alert("❌ TON Connect SDK غير متوفر.");
+        return;
     }
-};
 
+    // تعريف دالة ربط المحفظة
+    window.linkWallet = function () {
+        try {
+            // تهيئة TonConnect باستخدام المكتبة
+            const tonConnect = new TonConnectSDK.TonConnect();
 
-// ربط الدالة بزر ربط المحفظة
-window.bindLinkWalletButton = function () {
-    const button = document.getElementById("link-wallet-btn");
-    if (button) {
-        button.addEventListener("click", window.linkWallet);
-    } else {
-        console.error("Button with id 'link-wallet-btn' not found.");
-    }
-};
+            // طلب ربط المحفظة
+            tonConnect.connect()
+                .then((wallet) => {
+                    if (wallet?.account) {
+                        console.log("Wallet connected successfully:", wallet);
+                        const walletAddress = wallet.account;
 
-document.addEventListener("DOMContentLoaded", function () {
+                        // إرسال عنوان المحفظة إلى الخادم
+                        window.performAjaxRequest({
+                            url: "/api/link-wallet",
+                            method: "POST",
+                            data: { telegram_id: window.telegramId, wallet_address: walletAddress },
+                            onSuccess: (response) => alert("🎉 تم ربط المحفظة بنجاح!"),
+                            onError: (error) => alert("❌ حدث خطأ أثناء ربط المحفظة."),
+                        });
+                    } else {
+                        alert("❌ لم يتم ربط المحفظة.");
+                    }
+                })
+                .catch((error) => {
+                    console.error("Error connecting to wallet:", error);
+                    alert("❌ حدث خطأ أثناء محاولة ربط المحفظة.");
+                });
+        } catch (error) {
+            console.error("TON Connect SDK not available or not loaded:", error);
+            alert("❌ TON Connect SDK غير متوفر.");
+        }
+    };
+
+    // ربط الحدث بزر "ربط المحفظة"
     const linkWalletButton = document.getElementById("link-wallet-btn");
     if (linkWalletButton) {
         linkWalletButton.addEventListener("click", window.linkWallet);
@@ -506,3 +508,4 @@ document.addEventListener("DOMContentLoaded", function () {
         console.error("Button with ID 'link-wallet-btn' not found.");
     }
 });
+
