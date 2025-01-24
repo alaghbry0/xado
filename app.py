@@ -304,6 +304,16 @@ async def check_subscription():
         logging.error(f"Error in check_subscription: {str(e)}")
         return jsonify({"error": "An unexpected error occurred"}), 500
 
+from quart import send_file
+
+@app.route("/tonconnect-manifest.json")
+async def serve_manifest():
+    """
+    خدمة ملف tonconnect-manifest.json عند طلبه.
+    """
+    return await send_file("tonconnect-manifest.json")
+
+
 @app.route("/api/link-wallet", methods=["POST"])
 async def link_wallet():
     """
