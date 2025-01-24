@@ -456,52 +456,56 @@ function hideLoading() {
     }
 }
 
-// دالة لربط المحفظة باستخدام TON Connect SDK
-document.addEventListener("DOMContentLoaded", function () {
-    if (typeof TonConnect === "undefined") {
-        console.error("TON Connect SDK not loaded.");
-        alert("❌ TON Connect SDK غير متوفر.");
-    } else {
-        console.log("TON Connect SDK loaded successfully.");
-        window.linkWallet = function () {
-            try {
-                const tonConnect = new TonConnect();
-                tonConnect.connect()
-                    .then((wallet) => {
-                        if (wallet?.account) {
-                            console.log("Wallet connected successfully:", wallet);
-                            const walletAddress = wallet.account;
-
-                            // إرسال عنوان المحفظة إلى الخادم
-                            window.performAjaxRequest({
-                                url: "/api/link-wallet",
-                                method: "POST",
-                                data: { telegram_id: window.telegramId, wallet_address: walletAddress },
-                                onSuccess: (response) => alert("🎉 تم ربط المحفظة بنجاح!"),
-                                onError: (error) => alert("❌ حدث خطأ أثناء ربط المحفظة."),
-                            });
-                        } else {
-                            alert("❌ لم يتم ربط المحفظة.");
-                        }
-                    })
-                    .catch((error) => {
-                        console.error("Error connecting to wallet:", error);
-                        alert("❌ حدث خطأ أثناء محاولة ربط المحفظة.");
-                    });
-            } catch (error) {
-                console.error("TON Connect SDK not available:", error);
-                alert("❌ TON Connect SDK غير متوفر.");
-            }
-        };
-
-        // ربط الزر
-        const linkWalletButton = document.getElementById("link-wallet-btn");
-        if (linkWalletButton) {
-            linkWalletButton.addEventListener("click", window.linkWallet);
-        } else {
-            console.error("Button with ID 'link-wallet-btn' not found.");
-        }
+window.initializeTonConnect = function () {
+    // التحقق من تحميل مكتبة TonConnectUI
+    if (typeof TON_CONNECT_UI === 'undefined') {
+        console.error("TON Connect UI SDK not loaded.");
+        alert("❌ TON Connect UI SDK غير متوفر.");
+        return;
     }
+
+    // تهيئة TonConnectUI وربط الزر
+    window.tonConnectUI = new TON_CONNECT_UI.TonConnectUI({
+        manifestUrl: 'https://xado.onrender.com/tonconnect-manifest.json', // رابط ملف manifest
+        buttonRootId: 'ton-connect-button', // معرف عنصر الزر
+        uiOptions: {
+            twaReturnUrl: 'https://t.me/Te20s25tbot' // رابط العودة لتطبيق تليجرام
+        }
+    });
+
+    // التعامل مع استجابة ربط المحفظة
+    window.tonConnectUI.onStatusChange((wallet) => {
+        if (wallet) {
+            console.log('Wallet connected:', wallet);
+
+            const walletAddress = wallet.account; // الحصول على عنوان المحفظة
+
+            // إرسال عنوان المحفظة إلى الخادم
+            window.performAjaxRequest({
+                url: "/api/link-wallet",
+                method: "POST",
+                data: { telegram_id: window.telegramId, wallet_address: walletAddress },
+                onSuccess: (response) => alert("🎉 تم ربط المحفظة بنجاح!"),
+                onError: (error) => alert("❌ حدث خطأ أثناء ربط المحفظة.")
+            });
+        } else {
+            console.log('Wallet disconnected');
+            alert("⚠️ المحفظة غير متصلة.");
+        }
+    });
+
+    // التحقق من وجود زر Ton Connect
+    const linkWalletButton = document.getElementById("ton-connect-button");
+    if (linkWalletButton) {
+        console.log("Ton Connect button is initialized.");
+    } else {
+        console.error("Button with ID 'ton-connect-button' not found.");
+    }
+};
+
+// التأكد من تحميل DOM ثم استدعاء التهيئة
+document.addEventListener('DOMContentLoaded', function () {
+    window.initializeTonConnect();
 });
 
 
