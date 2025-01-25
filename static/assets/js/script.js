@@ -462,9 +462,17 @@ document.addEventListener('DOMContentLoaded', function () {
         return;
     }
 
-    // تهيئة TonConnectUI وربط الزر
+    // تخزين محتوى manifest في window
+    window.tonManifest = {
+        "url": "https://xado.onrender.com/",
+        "name": "Exaado mini app",
+        "iconUrl": "https://xado.onrender.com/logoo.png",
+        "manifest_version": 2
+    };
+
+    // تهيئة TonConnectUI وربط الزر باستخدام manifest المخزن
     const tonConnectUI = new TON_CONNECT_UI.TonConnectUI({
-        manifestUrl: 'https://xado.onrender.com/tonconnect-manifest.json',
+        manifest: window.tonManifest, // تمرير manifest مباشرة من window
         buttonRootId: 'ton-connect-button',
         uiOptions: {
             twaReturnUrl: 'https://t.me/Te20s25tbot'
@@ -475,48 +483,15 @@ document.addEventListener('DOMContentLoaded', function () {
     tonConnectUI.onStatusChange((wallet) => {
         if (wallet) {
             console.log('Wallet connected:', wallet);
-            const walletAddress = wallet.account; // عنوان المحفظة
-
-            if (!window.telegramId) {
-                console.error("Telegram ID not found.");
-                alert("❌ Telegram ID غير متوفر.");
-                return;
-            }
-
-            // إرسال بيانات المحفظة والمستخدم إلى الخادم
-            window.performAjaxRequest({
-                url: "/api/link-wallet",
-                method: "POST",
-                data: {
-                    telegram_id: window.telegramId,
-                    username: window.telegramUsername || "Unknown", // اسم المستخدم
-                    full_name: window.telegramFullName || "Unknown", // الاسم الكامل
-                    wallet_address: walletAddress
-                },
-                onSuccess: (response) => alert("🎉 تم ربط المحفظة بنجاح!"),
-                onError: (error) => alert("❌ حدث خطأ أثناء ربط المحفظة.")
-            });
+            alert(`🎉 Wallet connected: ${wallet.account}`);
         } else {
             console.log('Wallet disconnected');
-            alert("⚠️ المحفظة غير متصلة.");
+            alert("⚠️ Wallet disconnected.");
         }
     });
 
-    // تسجيل رسالة نجاح عند تهيئة الزر
+    // تسجيل رسالة نجاح عند تهيئة TonConnectUI
     console.log("Ton Connect UI initialized successfully.");
 });
-
-// Test if the manifest file can be fetched
-fetch('https://xado.onrender.com/tonconnect-manifest.json')
-  .then(response => {
-    if (response.ok) {
-      console.log("Manifest file loaded successfully:", response);
-    } else {
-      console.error("Failed to load manifest file:", response.statusText);
-    }
-  })
-  .catch(error => {
-    console.error("Error loading manifest file:", error);
-  });
 
 
