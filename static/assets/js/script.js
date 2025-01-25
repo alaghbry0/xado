@@ -456,6 +456,13 @@ function hideLoading() {
 }
 
 document.addEventListener('DOMContentLoaded', function () {
+    // التحقق من وجود العنصر قبل التهيئة
+    const buttonElement = document.getElementById('ton-connect');
+    if (!buttonElement) {
+        console.error("❌ ton-connect element not found in the document.");
+        return;
+    }
+
     // التحقق من تحميل مكتبة TonConnect UI
     if (typeof TON_CONNECT_UI === 'undefined') {
         console.error("TON Connect UI SDK not loaded.");
@@ -483,21 +490,8 @@ document.addEventListener('DOMContentLoaded', function () {
         }
     });
 
-    // التأكد من تحميل manifest بنجاح
-    fetch('https://xado.onrender.com/tonconnect-manifest.json')
-        .then((response) => {
-            if (response.ok) {
-                console.log("Manifest file loaded successfully.");
-            } else {
-                console.error("Failed to load manifest file:", response.statusText);
-            }
-        })
-        .catch((error) => {
-            console.error("Error loading manifest file:", error);
-        });
-
-    // تسجيل رسالة نجاح عند تهيئة TonConnectUI
     console.log("Ton Connect UI initialized successfully.");
 });
+
 
 
