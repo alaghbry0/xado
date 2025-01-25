@@ -4,6 +4,8 @@
   "name": "Exaado Telegram Web App",
   "description": "Exaado is a Telegram Web App for subscription and wallet integration.",
   "url": "https://xado.onrender.com",
+  "dAppUrl": "https://xado.onrender.com",
+  "dAppPublicKey": "-----BEGIN PUBLIC KEY-----\nMIIBIjANBgkqhkiG9w0BAQEFAAOCAQ8AMIIBCgKCAQEAuPhFYwiLzyr3gRtStz+b\nyYoYWPzBLOvVZEiLdw32ehPXxYRreekDnY3i3c+5R6IPNA6/dbRQp6sOXbJ0ko04\nkiZUrAMDS1xaFzIrL9Nrrl347myRYN9jj5HDIjgT+i4a03Urz7nZubo5Tjyz3sqL\nyARtOGo7SQma/gzmIAm2odL10eugI3YadLQICBf66VVabkpl/RdhI2LazxKSs7Ln\nOHMHyjUFtQMsQcc93gPjWvySTj+nHWFB3woWcb/5R4F6bGk3j5wjMeyybGW4h+bG\n87CPFUXqzsNyWae3L2ViSsF/Tu2NLE2ZlPggqUs+rdNmQjnZaVvaD57OnaDAquRs\n1wIDAQAB\n-----END PUBLIC KEY-----",
   "icons": [
     {
       "src": "https://xado.onrender.com/static/assets/img/icon.png",
@@ -11,7 +13,6 @@
       "type": "image/png"
     }
   ],
-  "dAppUrl": "https://xado.onrender.com",
   "permissions": {
     "ton_transfer": {
       "send": true,
