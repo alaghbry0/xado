@@ -1,8 +1,8 @@
 {
   "manifest_version": 2,
   "id": "5cefd851-444b-4542-8e90-5d949f08d076",
-  "name": "ُExaado Telegram Web App",
-  "description": "\"description\": \"Exaado is a Telegram Web App for subscription and wallet integration.\"\n",
+  "name": "Exaado Telegram Web App",
+  "description": "Exaado is a Telegram Web App for subscription and wallet integration.",
   "url": "https://xado.onrender.com",
   "icons": [
     {
@@ -10,5 +10,14 @@
       "sizes": "500x500",
       "type": "image/png"
     }
+  ],
+  "dAppUrl": "https://xado.onrender.com",
+  "supportedWallets": [
+    "tonkeeper",
+    "okx",
+    "bybit",
+    "wallet in telegram",
+    "binance",
+    "bitget"
   ]
 }
