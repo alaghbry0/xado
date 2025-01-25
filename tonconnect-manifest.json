@@ -1,5 +1,30 @@
 {
-    "url": "https://xado.onrender.com/",
-    "name": "Exaado mini app",
-    "iconUrl": "https://xado.onrender/logoo.png"
+  "manifest_version": 2,
+  "id": "5cefd851-444b-4542-8e90-5d949f08d076",
+  "name": "Exaado Telegram Web App",
+  "description": "Exaado is a Telegram Web App for subscription and wallet integration.",
+  "url": "https://xado.onrender.com",
+  "dAppUrl": "https://xado.onrender.com/shop",
+  "dAppPublicKey": "MIIBIjANBgkqhkiG9w0BAQEFAAOCAQ8AMIIBCgKCAQEA+Dt9WQET0RdnD1ER1Vlv\n6CXA2K22oNSA+ECey8qjBOlIehYj2pYcVkiRxJxHH0fS6ZCTdZLh66NOmGRKtX1z\nG0qxxr6Z7CWrWKvHwiXyEkBOCi+9EcgoBxQCvGsYgZWCEiJ6i+pEJI1a9XaF+BGG\narMy5srQY/AMUHW1n5GhhqbXWmuCdriCKRvgQPX4zqDQCjN1wIVgewU4KFhH8RRR\nqZYmk/Tu5O4Nrnu/Swo/zLaqjmzg9VTBwAFCAo94b0AmxESXjksaFFQvH9bKgoN8\noG3B8PbQv+pGB6QWIffdjzwW5fOZaZ2Fr8NXCnP07RblA4wAPNa6d43zNOocU71p\nmQIDAQAB",
+  "icons": [
+    {
+      "src": "https://xado.onrender.com/static/assets/img/logoo.png",
+      "sizes": "180x180",
+      "type": "image/png"
+    }
+  ],
+  "permissions": {
+    "ton_transfer": {
+      "send": true,
+      "receive": true
+    }
+  },
+  "supportedWallets": [
+    "tonkeeper",
+    "okx",
+    "bybit",
+    "wallet_in_telegram",
+    "binance",
+    "bitget"
+  ]
 }
