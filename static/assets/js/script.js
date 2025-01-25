@@ -457,7 +457,7 @@ function hideLoading() {
 
 document.addEventListener('DOMContentLoaded', function () {
     // التحقق من وجود العنصر قبل التهيئة
-    const buttonElement = document.getElementById('ton-connect');
+    const buttonElement = document.getElementById('ton-connect-button');
     if (!buttonElement) {
         console.error("❌ ton-connect element not found in the document.");
         return;
@@ -473,7 +473,7 @@ document.addEventListener('DOMContentLoaded', function () {
     // تهيئة TonConnectUI باستخدام manifestUrl
     const tonConnectUI = new TON_CONNECT_UI.TonConnectUI({
         manifestUrl: 'https://xado.onrender.com/tonconnect-manifest.json', // استخدام ملف manifest المرفوع
-        buttonRootId: 'ton-connect', // ID عنصر HTML لزر ربط المحفظة
+        buttonRootId: 'ton-connect-button', // ID عنصر HTML لزر ربط المحفظة
         uiOptions: {
             twaReturnUrl: 'https://t.me/Te20s25tbot' // رابط العودة لتطبيق Telegram
         }
