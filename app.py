@@ -3,6 +3,7 @@ import asyncio
 from config import DATABASE_CONFIG, TELEGRAM_BOT_TOKEN
 from quart import Quart, request, jsonify, render_template, send_file, make_response
 import logging
+import os
 from scheduler import start_scheduler
 from apscheduler.schedulers.asyncio import AsyncIOScheduler
 from quart_cors import cors
@@ -11,6 +12,9 @@ from aiogram.exceptions import TelegramAPIError
 from datetime import datetime, timezone, timedelta
 from db_queries import add_user, get_user, add_subscription, update_subscription, get_subscription, add_scheduled_task
 from database.db_utils import add_user_to_channel, close_telegram_bot_session
+from Crypto.Signature import pkcs1_15
+from Crypto.PublicKey import RSA
+from Crypto.Hash import SHA256
 
 telegram_bot = Bot(token=TELEGRAM_BOT_TOKEN)
 
@@ -56,6 +60,28 @@ async def close_resources():
 
 # إعداد تسجيل الأخطاء والمعلومات
 logging.basicConfig(level=logging.DEBUG, format='%(asctime)s - %(levelname)s - %(message)s')
+
+
+# تحميل المفتاح الخاص من متغير البيئة
+private_key_content = os.environ.get("PRIVATE_KEY")
+
+# التحقق من وجود المفتاح في البيئة
+if not private_key_content:
+    raise ValueError("PRIVATE_KEY environment variable is not set.")
+
+# استيراد المفتاح الخاص
+private_key = RSA.import_key(private_key_content)
+
+# الرسالة التي تريد توقيعها
+message = b"transaction data"
+hash_msg = SHA256.new(message)
+
+# توقيع الرسالة باستخدام المفتاح الخاص
+signature = pkcs1_15.new(private_key).sign(hash_msg)
+
+# طباعة التوقيع
+print("Signed message:", signature.hex())
+print(os.environ.get("PRIVATE_KEY"))
 
 
 # نقطة API للاشتراك
@@ -325,6 +351,7 @@ async def serve_manifest():
     خدمة ملف tonconnect-manifest.json مع دعم CORS.
     """
     response = await make_response(await send_file("tonconnect-manifest.json"))
+    response.headers["Content-Type"] = "application/json"
     response.headers["Access-Control-Allow-Origin"] = "*"  # السماح بالطلبات من أي مصدر
     response.headers["Access-Control-Allow-Methods"] = "GET, OPTIONS"  # السماح بالطرق المستخدمة
     response.headers["Access-Control-Allow-Headers"] = "Content-Type"  # السماح بالهيدر المحدد
