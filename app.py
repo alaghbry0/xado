@@ -1,7 +1,7 @@
 import asyncpg
 import asyncio
 from config import DATABASE_CONFIG, TELEGRAM_BOT_TOKEN
-from quart import Quart, request, jsonify, render_template
+from quart import Quart, request, jsonify, render_template, send_file, make_response
 import logging
 from scheduler import start_scheduler
 from apscheduler.schedulers.asyncio import AsyncIOScheduler
@@ -322,10 +322,13 @@ from quart import send_file
 @app.route("/tonconnect-manifest.json")
 async def serve_manifest():
     """
-    خدمة ملف tonconnect-manifest.json عند طلبه.
+    خدمة ملف tonconnect-manifest.json مع دعم CORS.
     """
-    return await send_file("tonconnect-manifest.json")
-
+    response = await make_response(await send_file("tonconnect-manifest.json"))
+    response.headers["Access-Control-Allow-Origin"] = "*"  # السماح بالطلبات من أي مصدر
+    response.headers["Access-Control-Allow-Methods"] = "GET, OPTIONS"  # السماح بالطرق المستخدمة
+    response.headers["Access-Control-Allow-Headers"] = "Content-Type"  # السماح بالهيدر المحدد
+    return response
 
 @app.route("/api/link-wallet", methods=["POST"])
 async def link_wallet():
