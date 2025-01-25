@@ -49,16 +49,20 @@ window.initializeTelegramWebApp = function () {
                 console.log("Username:", username);
                 console.log("Full Name:", fullName);
 
+                // قم بتحديث واجهة المستخدم
                 window.updateUserUI(fullName, username);
+
+                // إرسال Telegram ID إلى الخادم
                 window.sendTelegramIDToServer(window.telegramId, username);
             } else {
-                console.warn("بيانات المستخدم غير متوفرة.");
+                window.handleError("بيانات المستخدم غير متوفرة. تأكد من فتح التطبيق داخل Telegram.");
             }
         });
     } catch (error) {
         window.handleError("حدث خطأ أثناء تهيئة التطبيق: " + error.message);
     }
 };
+
 
 
 // تحديث واجهة المستخدم
@@ -470,6 +474,13 @@ document.addEventListener('DOMContentLoaded', function () {
         return;
     }
 
+    // التحقق من Telegram ID
+    if (!window.telegramId) {
+        console.error("Telegram ID not found. تأكد من أن Telegram WebApp تم تهيئته بنجاح.");
+        alert("❌ Telegram ID غير متوفر.");
+        return;
+    }
+
     // تهيئة TonConnectUI باستخدام manifestUrl
     const tonConnectUI = new TON_CONNECT_UI.TonConnectUI({
         manifestUrl: 'https://xado.onrender.com/tonconnect-manifest.json', // استخدام ملف manifest المرفوع
@@ -483,6 +494,7 @@ document.addEventListener('DOMContentLoaded', function () {
     tonConnectUI.onStatusChange((wallet) => {
         if (wallet) {
             console.log('Wallet connected:', wallet);
+            console.log('Telegram ID:', window.telegramId); // عرض Telegram ID
             alert(`🎉 Wallet connected: ${wallet.account}`);
         } else {
             console.log('Wallet disconnected');
