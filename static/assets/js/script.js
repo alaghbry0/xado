@@ -456,14 +456,29 @@ function hideLoading() {
     }
 }
 
-window.initializeTonConnect = function () {
+// Test if the manifest file can be fetched
+fetch('https://xado.onrender.com/tonconnect-manifest.json')
+  .then(response => {
+    if (response.ok) {
+      console.log("Manifest file loaded successfully:", response);
+    } else {
+      console.error("Manifest file failed to load:", response.statusText);
+    }
+  })
+  .catch(error => {
+    console.error("Error fetching manifest file:", error);
+  });
+
+
+document.addEventListener('DOMContentLoaded', function () {
     if (typeof TON_CONNECT_UI === 'undefined') {
         console.error("TON Connect UI SDK not loaded.");
         alert("❌ TON Connect UI SDK غير متوفر.");
         return;
     }
 
-    window.tonConnectUI = new TON_CONNECT_UI.TonConnectUI({
+    // تهيئة TonConnectUI وربط الزر
+    const tonConnectUI = new TON_CONNECT_UI.TonConnectUI({
         manifestUrl: 'https://xado.onrender.com/tonconnect-manifest.json',
         buttonRootId: 'ton-connect-button',
         uiOptions: {
@@ -471,7 +486,8 @@ window.initializeTonConnect = function () {
         }
     });
 
-    window.tonConnectUI.onStatusChange((wallet) => {
+    // التعامل مع استجابة ربط المحفظة
+    tonConnectUI.onStatusChange((wallet) => {
         if (wallet) {
             console.log('Wallet connected:', wallet);
             const walletAddress = wallet.account; // عنوان المحفظة
@@ -500,11 +516,9 @@ window.initializeTonConnect = function () {
             alert("⚠️ المحفظة غير متصلة.");
         }
     });
-};
 
-// التأكد من تحميل DOM ثم استدعاء التهيئة
-document.addEventListener('DOMContentLoaded', function () {
-    window.initializeTonConnect();
+    // تسجيل رسالة نجاح عند تهيئة الزر
+    console.log("Ton Connect UI initialized successfully.");
 });
 
 
