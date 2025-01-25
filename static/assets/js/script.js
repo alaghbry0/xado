@@ -456,26 +456,19 @@ function hideLoading() {
 }
 
 document.addEventListener('DOMContentLoaded', function () {
+    // التحقق من تحميل مكتبة TonConnect UI
     if (typeof TON_CONNECT_UI === 'undefined') {
         console.error("TON Connect UI SDK not loaded.");
         alert("❌ TON Connect UI SDK غير متوفر.");
         return;
     }
 
-    // تخزين محتوى manifest في window
-    window.tonManifest = {
-        "url": "https://xado.onrender.com/",
-        "name": "Exaado mini app",
-        "iconUrl": "https://xado.onrender.com/logoo.png",
-        "manifest_version": 2
-    };
-
-    // تهيئة TonConnectUI وربط الزر باستخدام manifest المخزن
+    // تهيئة TonConnectUI باستخدام manifestUrl
     const tonConnectUI = new TON_CONNECT_UI.TonConnectUI({
-        manifest: window.tonManifest, // تمرير manifest مباشرة من window
-        buttonRootId: 'ton-connect-button',
+        manifestUrl: 'https://xado.onrender.com/tonconnect-manifest.json', // استخدام ملف manifest المرفوع
+        buttonRootId: 'ton-connect', // ID عنصر HTML لزر ربط المحفظة
         uiOptions: {
-            twaReturnUrl: 'https://t.me/Te20s25tbot'
+            twaReturnUrl: 'https://t.me/Te20s25tbot' // رابط العودة لتطبيق Telegram
         }
     });
 
@@ -489,6 +482,19 @@ document.addEventListener('DOMContentLoaded', function () {
             alert("⚠️ Wallet disconnected.");
         }
     });
+
+    // التأكد من تحميل manifest بنجاح
+    fetch('https://xado.onrender.com/tonconnect-manifest.json')
+        .then((response) => {
+            if (response.ok) {
+                console.log("Manifest file loaded successfully.");
+            } else {
+                console.error("Failed to load manifest file:", response.statusText);
+            }
+        })
+        .catch((error) => {
+            console.error("Error loading manifest file:", error);
+        });
 
     // تسجيل رسالة نجاح عند تهيئة TonConnectUI
     console.log("Ton Connect UI initialized successfully.");
