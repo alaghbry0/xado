@@ -1,30 +1,5 @@
 {
-  "manifest_version": 2,
-  "id": "5cefd851-444b-4542-8e90-5d949f08d076",
-  "name": "Exaado Telegram Web App",
-  "description": "Exaado is a Telegram Web App for subscription and wallet integration.",
-  "url": "https://xado.onrender.com",
-  "dAppUrl": "https://xado.onrender.com",
-"dAppPublicKey": "MIIBIjANBgkqhkiG9w0BAQEFAAOCAQ8AMIIBCgKCAQEAuPhFYwiLzyr3gRtStz+byYoYWPzBLOvVZEiLdw32ehPXxYRreekDnY3i3c+5R6IPNA6/dbRQp6sOXbJ0ko04kiZUrAMDS1xaFzIrL9Nrrl347myRYN9jj5HDIjgT+i4a03Urz7nZubo5Tjyz3sqLyARtOGo7SQma/gzmIAm2odL10eugI3YadLQICBf66VVabkpl/RdhI2LazxKSs7LnOHMHyjUFtQMsQcc93gPjWvySTj+nHWFB3woWcb/5R4F6bGk3j5wjMeyybGW4h+bG87CPFUXqzsNyWae3L2ViSsF/Tu2NLE2ZlPggqUs+rdNmQjnZaVvaD57OnaDAquRs1wIDAQAB",
-  "icons": [
-    {
-      "src": "https://xado.onrender.com/static/assets/img/icon.png",
-      "sizes": "500x500",
-      "type": "image/png"
-    }
-  ],
-  "permissions": {
-    "ton_transfer": {
-      "send": true,
-      "receive": true
-    }
-  },
-  "supportedWallets": [
-    "tonkeeper",
-    "okx",
-    "bybit",
-    "wallet_in_telegram",
-    "binance",
-    "bitget"
-  ]
+    "url": "https://xado.onrender.com/",
+    "name": "Exaado mini app",
+    "iconUrl": "https://xado.onrender/logoo.png"
 }
