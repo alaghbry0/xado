@@ -69,6 +69,8 @@ async def subscribe():
         data = await request.get_json()
         telegram_id = int(data.get("telegram_id"))
         subscription_type_id = int(data.get("subscription_type_id"))
+        username = data.get("username", None)  # اسم المستخدم (اختياري)
+        full_name = data.get("full_name", None)  # الاسم الكامل (اختياري)
         logging.info(f"Received telegram_id: {telegram_id}, subscription_type_id: {subscription_type_id}")
 
         # التحقق من صحة البيانات المدخلة
@@ -78,6 +80,17 @@ async def subscribe():
             return jsonify({"error": error_message}), 400
 
         async with app.db_pool.acquire() as connection:
+            # التحقق من وجود المستخدم في جدول users
+            user = await get_user(connection, telegram_id)
+            if not user:
+                # إذا لم يكن المستخدم موجودًا، يتم إضافته
+                added = await add_user(connection, telegram_id, username=username, full_name=full_name)
+                if not added:
+                    logging.error(f"Failed to add user {telegram_id} to the users table.")
+                    return jsonify({"error": "Failed to register the user."}), 500
+            else:
+                # تحديث بيانات المستخدم إذا كان موجودًا
+                await add_user(connection, telegram_id, username=username, full_name=full_name)
             # جلب تفاصيل الاشتراك من جدول subscription_types
             subscription_type = await connection.fetchrow(
                 "SELECT id, name, channel_id FROM subscription_types WHERE id = $1", subscription_type_id
@@ -317,28 +330,49 @@ async def serve_manifest():
 @app.route("/api/link-wallet", methods=["POST"])
 async def link_wallet():
     """
-    ربط محفظة المستخدم وحفظ عنوانها.
+    استلام عنوان المحفظة وإضافته إلى قاعدة البيانات. تحديث بيانات المستخدم إذا كان موجودًا أو إضافته إذا كان غير موجود.
     """
     try:
+        # استلام البيانات من الطلب
         data = await request.get_json()
-        telegram_id = int(data.get("telegram_id"))
+        telegram_id = data.get("telegram_id")
         wallet_address = data.get("wallet_address")
+        username = data.get("username")  # يمكن إرسال اسم المستخدم من العميل
+        full_name = data.get("full_name")  # يمكن إرسال الاسم الكامل من العميل
 
-        if not wallet_address:
-            return jsonify({"error": "Wallet address is required"}), 400
+        # التحقق من صحة البيانات
+        if not telegram_id or not wallet_address:
+            return jsonify({"error": "Missing telegram_id or wallet_address"}), 400
 
         async with app.db_pool.acquire() as connection:
-            # تحديث عنوان المحفظة في جدول المستخدمين
-            await connection.execute(
-                "UPDATE users SET wallet_address = $1 WHERE telegram_id = $2",
-                wallet_address, telegram_id
-            )
+            # التحقق مما إذا كان المستخدم موجودًا
+            user = await get_user(connection, telegram_id)
+            if user:
+                # إذا كان المستخدم موجودًا، قم بتحديث عنوان المحفظة
+                query = """
+                UPDATE users
+                SET wallet_address = $1
+                WHERE telegram_id = $2
+                """
+                await connection.execute(query, wallet_address, telegram_id)
+                logging.info(f"Updated wallet address for user {telegram_id}.")
+            else:
+                # إذا كان المستخدم غير موجود، قم بإضافته
+                await add_user(connection, telegram_id, username=username, full_name=full_name)
+                # ثم قم بتحديث عنوان المحفظة
+                query = """
+                UPDATE users
+                SET wallet_address = $1
+                WHERE telegram_id = $2
+                """
+                await connection.execute(query, wallet_address, telegram_id)
+                logging.info(f"Added user {telegram_id} and set wallet address.")
 
-        return jsonify({"message": "Wallet linked successfully"}), 200
+        return jsonify({"message": "Wallet address linked successfully!"}), 200
 
     except Exception as e:
         logging.error(f"Error linking wallet: {e}")
-        return jsonify({"error": "An unexpected error occurred"}), 500
+        return jsonify({"error": "Internal server error"}), 500
 
 
 @app.route("/", endpoint="index")

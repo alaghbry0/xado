@@ -457,34 +457,41 @@ function hideLoading() {
 }
 
 window.initializeTonConnect = function () {
-    // التحقق من تحميل مكتبة TonConnectUI
     if (typeof TON_CONNECT_UI === 'undefined') {
         console.error("TON Connect UI SDK not loaded.");
         alert("❌ TON Connect UI SDK غير متوفر.");
         return;
     }
 
-    // تهيئة TonConnectUI وربط الزر
     window.tonConnectUI = new TON_CONNECT_UI.TonConnectUI({
-        manifestUrl: 'https://xado.onrender.com/tonconnect-manifest.json', // رابط ملف manifest
-        buttonRootId: 'ton-connect-button', // معرف عنصر الزر
+        manifestUrl: 'https://xado.onrender.com/tonconnect-manifest.json',
+        buttonRootId: 'ton-connect-button',
         uiOptions: {
-            twaReturnUrl: 'https://t.me/Te20s25tbot' // رابط العودة لتطبيق تليجرام
+            twaReturnUrl: 'https://t.me/Te20s25tbot'
         }
     });
 
-    // التعامل مع استجابة ربط المحفظة
     window.tonConnectUI.onStatusChange((wallet) => {
         if (wallet) {
             console.log('Wallet connected:', wallet);
+            const walletAddress = wallet.account; // عنوان المحفظة
 
-            const walletAddress = wallet.account; // الحصول على عنوان المحفظة
+            if (!window.telegramId) {
+                console.error("Telegram ID not found.");
+                alert("❌ Telegram ID غير متوفر.");
+                return;
+            }
 
-            // إرسال عنوان المحفظة إلى الخادم
+            // إرسال بيانات المحفظة والمستخدم إلى الخادم
             window.performAjaxRequest({
                 url: "/api/link-wallet",
                 method: "POST",
-                data: { telegram_id: window.telegramId, wallet_address: walletAddress },
+                data: {
+                    telegram_id: window.telegramId,
+                    username: window.telegramUsername || "Unknown", // اسم المستخدم
+                    full_name: window.telegramFullName || "Unknown", // الاسم الكامل
+                    wallet_address: walletAddress
+                },
                 onSuccess: (response) => alert("🎉 تم ربط المحفظة بنجاح!"),
                 onError: (error) => alert("❌ حدث خطأ أثناء ربط المحفظة.")
             });
@@ -493,14 +500,6 @@ window.initializeTonConnect = function () {
             alert("⚠️ المحفظة غير متصلة.");
         }
     });
-
-    // التحقق من وجود زر Ton Connect
-    const linkWalletButton = document.getElementById("ton-connect-button");
-    if (linkWalletButton) {
-        console.log("Ton Connect button is initialized.");
-    } else {
-        console.error("Button with ID 'ton-connect-button' not found.");
-    }
 };
 
 // التأكد من تحميل DOM ثم استدعاء التهيئة
