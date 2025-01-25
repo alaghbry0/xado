@@ -12,11 +12,17 @@
     }
   ],
   "dAppUrl": "https://xado.onrender.com",
+  "permissions": {
+    "ton_transfer": {
+      "send": true,
+      "receive": true
+    }
+  },
   "supportedWallets": [
     "tonkeeper",
     "okx",
     "bybit",
-    "wallet in telegram",
+    "wallet_in_telegram",
     "binance",
     "bitget"
   ]
