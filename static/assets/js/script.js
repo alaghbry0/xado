@@ -20,6 +20,12 @@ window.performAjaxRequest = function ({ url, method = "GET", data = null, onSucc
     }
 };
 
+'use strict';
+
+// تعريف المتغيرات العامة
+window.tg = null;
+window.telegramId = null;
+
 // التهيئة الأساسية لتطبيق Telegram WebApp
 window.initializeTelegramWebApp = function () {
     try {
@@ -60,8 +66,7 @@ window.initializeTelegramWebApp = function () {
                 // إرسال Telegram ID إلى الخادم
                 window.sendTelegramIDToServer(window.telegramId, username);
             } else {
-                // التعامل مع حالة عدم توفر بيانات المستخدم
-                window.handleError("بيانات المستخدم غير متوفرة. تأكد من فتح التطبيق داخل Telegram.");
+                console.warn("بيانات المستخدم غير متوفرة. تأكد من فتح التطبيق داخل Telegram.");
             }
         });
     } catch (error) {
@@ -79,6 +84,8 @@ window.updateUserUI = function (fullName, username) {
 
         if (userNameElement) userNameElement.textContent = fullName;
         if (userUsernameElement) userUsernameElement.textContent = username;
+
+        console.log("تم تحديث واجهة المستخدم.");
     } catch (error) {
         console.error("Error in updateUserUI:", error);
     }
@@ -86,12 +93,13 @@ window.updateUserUI = function (fullName, username) {
 
 // إرسال Telegram ID إلى الخادم
 window.sendTelegramIDToServer = function (telegramId, username) {
+    console.log("إرسال Telegram ID إلى الخادم...");
     window.performAjaxRequest({
         url: "/api/verify", // رابط API للتحقق
         method: "POST",
         data: { telegram_id: telegramId, username },
         onSuccess: (response) => {
-            console.log("تم التحقق من Telegram ID:", response);
+            console.log("تم التحقق من Telegram ID بنجاح:", response);
         },
         onError: (error) => {
             console.error("حدث خطأ أثناء التحقق من Telegram ID:", error);
@@ -101,7 +109,7 @@ window.sendTelegramIDToServer = function (telegramId, username) {
 
 // التعامل مع الأخطاء
 window.handleError = function (message) {
-    console.error(message);
+    console.error("خطأ:", message);
     alert(message);
 };
 
@@ -128,9 +136,10 @@ document.addEventListener("DOMContentLoaded", function () {
     if (window.checkTelegramEnvironment()) {
         window.initializeTelegramWebApp();
     } else {
-        console.warn("Application running outside Telegram WebApp.");
+        console.warn("التطبيق يعمل خارج بيئة Telegram WebApp.");
     }
 });
+
 
 $(document).ready(function () {
 
@@ -465,30 +474,33 @@ document.addEventListener('DOMContentLoaded', function () {
     // التحقق من وجود العنصر قبل التهيئة
     const buttonElement = document.getElementById('ton-connect-button');
     if (!buttonElement) {
-        console.error("❌ ton-connect element not found in the document.");
+        console.error("❌ عنصر ton-connect-button غير موجود في المستند.");
         return;
     }
 
     // التحقق من تحميل مكتبة TonConnect UI
     if (typeof TON_CONNECT_UI === 'undefined') {
-        console.error("TON Connect UI SDK not loaded.");
+        console.error("TON Connect UI SDK غير متوفر.");
         alert("❌ TON Connect UI SDK غير متوفر.");
         return;
     }
 
-    // جلب Telegram ID
-    const tg = window.Telegram?.WebApp;
-    const userData = tg?.initDataUnsafe?.user;
+    // التحقق من Telegram ID
+    if (!window.telegramId) {
+        const tg = window.Telegram?.WebApp;
+        const userData = tg?.initDataUnsafe?.user;
 
-    if (!userData || !userData.id) {
-        console.error("Telegram ID غير متوفر. تأكد من تشغيل التطبيق داخل Telegram.");
-        alert("❌ Telegram ID غير متوفر.");
-        return;
+        if (userData?.id) {
+            window.telegramId = userData.id; // استخراج Telegram ID كحل احتياطي
+            console.log("تم استخراج Telegram ID كحل احتياطي:", window.telegramId);
+        } else {
+            console.error("Telegram ID غير متوفر. تأكد من تشغيل التطبيق داخل Telegram.");
+            alert("❌ Telegram ID غير متوفر.");
+            return;
+        }
+    } else {
+        console.log("Telegram ID متوفر:", window.telegramId);
     }
-
-    // تخزين Telegram ID في نافذة التطبيق
-    window.telegramId = userData.id;
-    console.log("Telegram ID:", window.telegramId);
 
     // تهيئة TonConnectUI باستخدام manifestUrl
     const tonConnectUI = new TON_CONNECT_UI.TonConnectUI({
@@ -505,6 +517,8 @@ document.addEventListener('DOMContentLoaded', function () {
             console.log('Wallet connected:', wallet);
             console.log('Telegram ID:', window.telegramId); // عرض Telegram ID
             alert(`🎉 Wallet connected: ${wallet.account}`);
+            // إرسال بيانات المحفظة إلى الخادم
+            window.sendWalletInfoToServer(wallet.account, window.telegramId);
         } else {
             console.log('Wallet disconnected');
             alert("⚠️ Wallet disconnected.");
@@ -513,6 +527,24 @@ document.addEventListener('DOMContentLoaded', function () {
 
     console.log("Ton Connect UI initialized successfully.");
 });
+
+// دالة لإرسال بيانات المحفظة إلى الخادم
+window.sendWalletInfoToServer = function (walletAddress, telegramId) {
+    console.log("إرسال بيانات المحفظة إلى الخادم...");
+    window.performAjaxRequest({
+        url: "/api/link-wallet", // رابط API الخاص بربط المحفظة
+        method: "POST",
+        data: { wallet_address: walletAddress, telegram_id: telegramId },
+        onSuccess: (response) => {
+            console.log("تم ربط المحفظة بنجاح:", response);
+            alert("🎉 تم ربط المحفظة بنجاح!");
+        },
+        onError: (error) => {
+            console.error("خطأ أثناء ربط المحفظة:", error);
+            alert("❌ حدث خطأ أثناء ربط المحفظة. يرجى المحاولة لاحقًا.");
+        },
+    });
+};
 
 
 
