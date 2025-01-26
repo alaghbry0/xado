@@ -544,9 +544,15 @@ document.addEventListener('DOMContentLoaded', function () {
 
 // دالة لإرسال بيانات المحفظة إلى الخادم
 window.sendWalletInfoToServer = function (walletAddress, telegramId) {
-    // استخراج العنوان فقط من الكائن
-    const formattedWalletAddress = walletAddress.address; // افترض أن الحقل 'address' يحتوي على العنوان
+    // إذا كان walletAddress كائنًا، استخراج العنوان النصي فقط
+    const formattedWalletAddress = typeof walletAddress === "object" && walletAddress.address
+        ? walletAddress.address
+        : walletAddress; // إذا كان نصًا، استخدمه كما هو
+
     console.log("إرسال بيانات المحفظة إلى الخادم...");
+    console.log("Telegram ID:", telegramId);
+    console.log("Wallet Address:", formattedWalletAddress);
+
     window.performAjaxRequest({
         url: "/api/link-wallet",
         method: "POST",
@@ -564,6 +570,7 @@ window.sendWalletInfoToServer = function (walletAddress, telegramId) {
         },
     });
 };
+
 
 
 
