@@ -20,7 +20,7 @@ telegram_bot = Bot(token=TELEGRAM_BOT_TOKEN)
 
 # إنشاء التطبيق
 app = Quart(__name__)
-app = cors(app)  # تمكين CORS لجميع الطلبات
+app = cors(app, allow_origin="*")  # تمكين CORS لجميع الطلبات
 
 async def setup_scheduler():
     logging.info("Calling start_scheduler from app.py")
@@ -345,17 +345,12 @@ async def check_subscription():
 
 from quart import send_file
 
-@app.route("/tonconnect-manifest.json")
+@app.route("/tonconnect-manifest.json", methods=["GET", "OPTIONS"])
 async def serve_manifest():
     """
     خدمة ملف tonconnect-manifest.json مع دعم CORS.
     """
-    response = await make_response(await send_file("tonconnect-manifest.json"))
-    response.headers["Content-Type"] = "application/json"
-    response.headers["Access-Control-Allow-Origin"] = "*"  # السماح بالطلبات من أي مصدر
-    response.headers["Access-Control-Allow-Methods"] = "GET, OPTIONS"  # السماح بالطرق المستخدمة
-    response.headers["Access-Control-Allow-Headers"] = "Content-Type"  # السماح بالهيدر المحدد
-    return response
+    return await app.send_static_file("tonconnect-manifest.json")
 
 @app.route("/api/link-wallet", methods=["POST"])
 async def link_wallet():
