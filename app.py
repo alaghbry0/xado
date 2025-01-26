@@ -359,13 +359,10 @@ async def serve_manifest():
 
 @app.route("/api/link-wallet", methods=["POST"])
 async def link_wallet():
-    """
-    استلام عنوان المحفظة وإضافته إلى قاعدة البيانات. تحديث بيانات المستخدم إذا كان موجودًا أو إضافته إذا كان غير موجود.
-    """
     try:
         # استلام البيانات من الطلب
         data = await request.get_json()
-        telegram_id = data.get("telegram_id")
+        telegram_id = int(data.get("telegram_id"))  # تحويل إلى رقم صحيح
         wallet_address = data.get("wallet_address")
         username = data.get("username")  # يمكن إرسال اسم المستخدم من العميل
         full_name = data.get("full_name")  # يمكن إرسال الاسم الكامل من العميل
@@ -400,6 +397,9 @@ async def link_wallet():
 
         return jsonify({"message": "Wallet address linked successfully!"}), 200
 
+    except ValueError as ve:
+        logging.error(f"Invalid input data: {ve}")
+        return jsonify({"error": "Invalid input data"}), 400
     except Exception as e:
         logging.error(f"Error linking wallet: {e}")
         return jsonify({"error": "Internal server error"}), 500
