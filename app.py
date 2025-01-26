@@ -364,6 +364,11 @@ async def link_wallet():
         data = await request.get_json()
         telegram_id = int(data.get("telegram_id"))  # تحويل إلى رقم صحيح
         wallet_address = data.get("wallet_address")
+
+        # إذا كان wallet_address كائنًا، استخراج العنوان النصي فقط
+        if isinstance(wallet_address, dict) and "address" in wallet_address:
+            wallet_address = wallet_address["address"]
+
         username = data.get("username")  # يمكن إرسال اسم المستخدم من العميل
         full_name = data.get("full_name")  # يمكن إرسال الاسم الكامل من العميل
 
