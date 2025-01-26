@@ -516,6 +516,22 @@ document.addEventListener('DOMContentLoaded', function () {
         console.log("Telegram ID متوفر:", window.telegramId);
     }
 
+    // اختبار إذا كان manifest يتم تحميله بشكل صحيح
+    fetch('https://xado.onrender.com/tonconnect-manifest.json')
+        .then(response => {
+            if (!response.ok) {
+                throw new Error(`Failed to load manifest: ${response.statusText}`);
+            }
+            return response.json();
+        })
+        .then(manifest => {
+            console.log("Manifest loaded successfully:", manifest);
+        })
+        .catch(error => {
+            console.error("Error loading manifest:", error);
+            alert("❌ حدث خطأ أثناء تحميل manifest. يرجى التحقق من الإعدادات.");
+        });
+
     // تهيئة TonConnectUI باستخدام manifestUrl
     const tonConnectUI = new TON_CONNECT_UI.TonConnectUI({
         manifestUrl: 'https://xado.onrender.com/tonconnect-manifest.json', // استخدام ملف manifest المرفوع
@@ -537,6 +553,12 @@ document.addEventListener('DOMContentLoaded', function () {
             console.log('Wallet disconnected');
             alert("⚠️ Wallet disconnected.");
         }
+    });
+
+    // إضافة منطق إضافي للتعامل مع الأخطاء
+    tonConnectUI.on('error', (error) => {
+        console.error("TON Connect UI Error:", error);
+        alert("❌ حدث خطأ في Ton Connect UI: " + error.message);
     });
 
     console.log("Ton Connect UI initialized successfully.");
