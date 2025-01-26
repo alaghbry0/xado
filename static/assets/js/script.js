@@ -471,6 +471,8 @@ function hideLoading() {
 }
 
 document.addEventListener('DOMContentLoaded', function () {
+    console.log("DOM fully loaded and parsed.");
+
     // التحقق من وجود العنصر قبل التهيئة
     const buttonElement = document.getElementById('ton-connect-button');
     if (!buttonElement) {
@@ -545,7 +547,6 @@ window.sendWalletInfoToServer = function (walletAddress, telegramId) {
         },
     });
 };
-
 
 
 
