@@ -544,11 +544,16 @@ document.addEventListener('DOMContentLoaded', function () {
 
 // دالة لإرسال بيانات المحفظة إلى الخادم
 window.sendWalletInfoToServer = function (walletAddress, telegramId) {
+    // استخراج العنوان فقط من الكائن
+    const formattedWalletAddress = walletAddress.address; // افترض أن الحقل 'address' يحتوي على العنوان
     console.log("إرسال بيانات المحفظة إلى الخادم...");
     window.performAjaxRequest({
-        url: "/api/link-wallet", // رابط API الخاص بربط المحفظة
+        url: "/api/link-wallet",
         method: "POST",
-        data: { wallet_address: walletAddress, telegram_id: telegramId },
+        data: {
+            wallet_address: formattedWalletAddress, // إرسال العنوان النصي فقط
+            telegram_id: telegramId,
+        },
         onSuccess: (response) => {
             console.log("تم ربط المحفظة بنجاح:", response);
             alert("🎉 تم ربط المحفظة بنجاح!");
